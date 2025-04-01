@@ -3,6 +3,7 @@
 ## Install dependencies
 ```bash
 pip install tensorflow tensorflow-hub
+```
 
 ## Download Universal Sentence Encoder Model
 ```bash
