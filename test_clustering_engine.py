@@ -1,15 +1,14 @@
 import pandas as pd
 import clustering_engine
 
-df = pd.read_csv('data/WELFake_Dataset.csv')
-
 # randomly sample n rows
-n = 1000                                # change this to however many samples we want to test the clustering engine with
+df = pd.read_csv('data/WELFake_Dataset.csv')
+n = 1000                                        # change this to however many samples we want to test the clustering engine with
 sampled_df = df.sample(n=n)
 
 # display what we sampled and invoke the clustering engine
 for doc_id, row in sampled_df.iterrows():
-    
+
     doc_title = str(row['title'])
     doc_text = str(row['text'])
     doc_label = int(row['label'])
