@@ -17,4 +17,4 @@ tar -xvzf use_model.tar.gz -C use_model  # Extract the model into the folder
 ```bash
 mkdir data  # Create a folder for the data
 ```
-Download WELFake_Dataset.csv from [Kaggle](https://www.kaggle.com/datasets/saurabhshahane/fake-news-classification?resource=download).
+Download ```WELFake_Dataset.csv``` from [Kaggle](https://www.kaggle.com/datasets/saurabhshahane/fake-news-classification?resource=download).
