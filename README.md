@@ -4,6 +4,8 @@
 ```bash
 pip install tensorflow tensorflow-hub
 pip install pandas
+pip install scikit-learn
+pip install numpy
 ```
 
 ### Download Universal Sentence Encoder Model
