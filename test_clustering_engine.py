@@ -1,6 +1,5 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import collections
 import clustering_engine
 
 # randomly sample n rows
@@ -40,28 +39,11 @@ for i, cluster in enumerate(clustering_engine.clusters):
 
 # visualize
 cluster_sizes = [len(cluster) for cluster in clustering_engine.clusters]
-# cluster_size_counts = collections.Counter(cluster_sizes)
-# sizes = sorted(cluster_size_counts.keys())  
-# frequencies = [cluster_size_counts[size] for size in sizes]
-# plt.figure(figsize=(24, 12))
-# plt.bar(sizes, frequencies, color='skyblue', edgecolor='black')
-# plt.xlabel('Cluster Size')
-# plt.ylabel('Frequency')
-# plt.title('Distribution of Cluster Sizes')
-# plt.xticks(sizes, rotation=90)  # Show all sizes clearly
-# plt.grid(axis='y', linestyle='--', alpha=0.7)
-# plt.show()
 plt.figure(figsize=(12, 6))
-
-# Use a histogram with automatic binning for better visualization
 plt.hist(cluster_sizes, bins=range(1, max(cluster_sizes) + 2), color='skyblue', edgecolor='black', alpha=0.7)
-
 plt.xlabel('Cluster Size')
 plt.ylabel('Frequency')
 plt.title('Distribution of Cluster Sizes')
-
-# Adjust x-axis ticks to be readable
 plt.xticks(rotation=45)
-
 plt.grid(axis='y', linestyle='--', alpha=0.7)
 plt.show()
