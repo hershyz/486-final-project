@@ -6,6 +6,7 @@ pip install tensorflow tensorflow-hub
 pip install pandas
 pip install scikit-learn
 pip install numpy
+pip install matplotlib
 ```
 
 ### Download Universal Sentence Encoder Model
@@ -19,4 +20,5 @@ tar -xvzf use_model.tar.gz -C use_model  # Extract the model into the folder
 ```bash
 mkdir data  # Create a folder for the data
 ```
-Download ```WELFake_Dataset.csv``` from [Kaggle](https://www.kaggle.com/datasets/saurabhshahane/fake-news-classification?resource=download).
+- Download the file ```WELFake_Dataset.csv``` from [Kaggle](https://www.kaggle.com/datasets/saurabhshahane/fake-news-classification?resource=download).
+- Within the CSV, add the feature label ```doc_id``` first on the first line. It should read ```doc_id,title,text,label```.

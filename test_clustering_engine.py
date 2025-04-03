@@ -18,11 +18,19 @@ sampled_fake = fake_df.sample(n=fake_n, replace=False)
 sampled_df = pd.concat([sampled_real, sampled_fake]).sample(frac=1).reset_index(drop=True)
 
 # display what we sampled and invoke the clustering engine
-for doc_id, row in sampled_df.iterrows():
+real_docs = set()
+fake_docs = set()
+for _, row in sampled_df.iterrows():
 
+    doc_id = int(row['doc_id'])
     doc_title = str(row['title'])
     doc_text = str(row['text'])
     doc_label = int(row['label'])
+
+    if doc_label == 1:
+        real_docs.add(doc_id)
+    else:
+        fake_docs.add(doc_id)
 
     if len(doc_title) == 0 or len(doc_text) == 0 or doc_label == None:
         continue
@@ -42,12 +50,13 @@ for _ in range(25):
 for i, cluster in enumerate(clustering_engine.clusters):
     print(f'Cluster {i}:')
     for doc_id in cluster:
-        doc_title = sampled_df.loc[doc_id, 'title']
+        # doc_title = sampled_df.loc[doc_id, 'title']
+        doc_title = sampled_df[sampled_df['doc_id'] == doc_id]['title'].values[0]
         print(f"  - {doc_title}")
 
     print("-" * 50)
 
-# visualize
+# visualize cluster sizes and their frequency of occurrence
 cluster_sizes = [len(cluster) for cluster in clustering_engine.clusters]
 plt.figure(figsize=(12, 6))
 plt.hist(cluster_sizes, bins=range(1, max(cluster_sizes) + 2), color='skyblue', edgecolor='black', alpha=0.7)
@@ -56,4 +65,28 @@ plt.ylabel('Frequency')
 plt.title('Distribution of Cluster Sizes')
 plt.xticks(rotation=45)
 plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.show()
+
+# visualize correlation between cluster size and ratio of real documents
+cluster_sizes = []
+real_ratios = []
+
+for cluster in clustering_engine.clusters:
+    cluster_size = len(cluster)
+    num_real = sum(1 for doc_id in cluster if doc_id in real_docs)
+    num_fake = cluster_size - num_real
+
+    real_ratio = num_real / cluster_size if cluster_size > 0 else 0
+
+    cluster_sizes.append(cluster_size)
+    real_ratios.append(real_ratio)
+
+plt.figure(figsize=(10, 6))
+plt.scatter(cluster_sizes, real_ratios, alpha=0.6, color='blue', edgecolors='black')
+plt.xlim(0, 100)
+plt.ylim(0, 1)
+plt.xlabel('Cluster Size')
+plt.ylabel('Real Report Ratio')
+plt.title('Correlation Between Cluster Size and Real Report Ratio')
+plt.grid(True, linestyle='--', alpha=0.7)
 plt.show()
