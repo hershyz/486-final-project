@@ -2,10 +2,20 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import clustering_engine
 
-# randomly sample n rows
+# hyperparameters
+n = 1000                           # number of sampled reports (without replacement)
+real_report_ratio = 0.7            # ratio of real reports to use
+
+# randomly sample reports
 df = pd.read_csv('data/WELFake_Dataset.csv')
-n = 1000                                        # change this to however many samples we want to test the clustering engine with
-sampled_df = df.sample(n=n)
+# sampled_df = df.sample(n=n)
+real_df = df[df['label'] == 1]
+fake_df = df[df['label'] == 0]
+real_n = int(n * real_report_ratio)
+fake_n = n - real_n
+sampled_real = real_df.sample(n=real_n, replace=False)
+sampled_fake = fake_df.sample(n=fake_n, replace=False)
+sampled_df = pd.concat([sampled_real, sampled_fake]).sample(frac=1).reset_index(drop=True)
 
 # display what we sampled and invoke the clustering engine
 for doc_id, row in sampled_df.iterrows():
