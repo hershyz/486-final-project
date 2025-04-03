@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
 # hyperparameters
-doc_title_weight_factor: float = 1.5                         # significance multiplier the title has over an arbitrary sentence from the rest of the text
+doc_title_weight_factor: float = 1.4                         # significance multiplier the title has over an arbitrary sentence from the rest of the text
 starting_best_mean_similarity: float = 0.3                   # discriminating cosine silimarity threshold for creating a new cluster
 
 # data

@@ -4,7 +4,7 @@ import clustering_engine
 
 # hyperparameters
 n = 1000                           # number of sampled reports (without replacement)
-real_report_ratio = 0.7            # ratio of real reports to use
+real_report_ratio = 0.75           # ratio of real reports to use
 
 # randomly sample reports
 df = pd.read_csv('data/WELFake_Dataset.csv')
