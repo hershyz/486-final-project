@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
 # hyperparameters
-doc_title_weight_factor: int = 2                             # significance multiplier the title has over an arbitrary sentence from the rest of the text
+doc_title_weight_factor: float = 1.5                         # significance multiplier the title has over an arbitrary sentence from the rest of the text
 starting_best_mean_similarity: float = 0.3                   # discriminating cosine silimarity threshold for creating a new cluster
 
 # data
@@ -17,16 +17,17 @@ model = hub.load('use_model/archive')
 def cluster_new(doc_id: int, doc_title: str, doc_text: str):
     
     # # create batch embedding job
-    sentences = []
-    for _ in range(doc_title_weight_factor):
-        sentences.append(doc_title)
+    sentences = [doc_title]
     for sentence in doc_text.split('.'):
         if sentence.strip():
             sentences.append(sentence)
     
     # generate embeddings from the model and mean pool
     generated_embeddings = model(sentences)
-    doc_vector = np.mean(generated_embeddings, axis=0)
+    sentence_weights = np.array([doc_title_weight_factor] + [1] * (len(sentences) - 1)).reshape(-1, 1)
+    # doc_vector = np.mean(generated_embeddings, axis=0)
+    doc_vector = np.sum(generated_embeddings * sentence_weights, axis=0)
+    doc_vector /= np.sum(sentence_weights)
     embedding[doc_id] = doc_vector
 
     # microcluster based on embedding
