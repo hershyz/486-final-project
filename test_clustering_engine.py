@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import time
 import clustering_engine
 
 # hyperparameters
@@ -20,7 +21,9 @@ sampled_df = pd.concat([sampled_real, sampled_fake]).sample(frac=1).reset_index(
 # display what we sampled and invoke the clustering engine
 real_docs = set()
 fake_docs = set()
-for _, row in sampled_df.iterrows():
+clustering_latencies = []
+num_clustered_docs = []
+for i, row in sampled_df.iterrows():
 
     doc_id = int(row['doc_id'])
     doc_title = str(row['title'])
@@ -39,7 +42,12 @@ for _, row in sampled_df.iterrows():
     print(f'doc_title: {doc_title}')
     print(f'doc_label {doc_label}')
 
+    start_time = time.time()
     clustering_engine.cluster_new(doc_id=doc_id, doc_title=doc_title, doc_text=doc_text)
+    end_time = time.time()
+
+    clustering_latencies.append(end_time - start_time)
+    num_clustered_docs.append(i)
 
     print("-" * 50)
 
@@ -88,5 +96,14 @@ plt.ylim(0, 1)
 plt.xlabel('Cluster Size')
 plt.ylabel('Real Report Ratio')
 plt.title('Correlation Between Cluster Size and Real Report Ratio')
+plt.grid(True, linestyle='--', alpha=0.7)
+plt.show()
+
+# visualize clustering latencies
+plt.figure(figsize=(10, 6))
+plt.plot(num_clustered_docs, clustering_latencies, marker='o', linestyle='-', color='red', alpha=0.7)
+plt.xlabel('Number of Documents Clustered')
+plt.ylabel('Time to Cluster (seconds)')
+plt.title('Clustering Time vs. Number of Documents Clustered')
 plt.grid(True, linestyle='--', alpha=0.7)
 plt.show()
