@@ -1,6 +1,7 @@
 import tensorflow_hub as hub
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
+import common
 
 # hyperparameters
 doc_title_weight_factor: float = 1.4                         # significance multiplier the title has over an arbitrary sentence from the rest of the text
@@ -24,7 +25,17 @@ def cluster_new(doc_id: int, doc_title: str, doc_text: str):
     
     # generate embeddings from the model and mean pool
     generated_embeddings = model(sentences)
-    sentence_weights = np.array([doc_title_weight_factor] + [1] * (len(sentences) - 1)).reshape(-1, 1)
+
+    # generate sentence weights based on how polarized the sentence is (further from 0.5 probability real = higher weight)
+    # sentence_weights = np.array([doc_title_weight_factor] + [1] * (len(sentences) - 1)).reshape(-1, 1)
+    sentence_weights = []
+    sentence_weights.append(abs(common.p_real(doc_title) - 0.5) * doc_title_weight_factor)
+    sentence_weights = [abs(common.p_real(doc_title) - 0.5) * doc_title_weight_factor] + [
+        abs(common.p_real(sentence) - 0.5) for sentence in sentences[1:]
+    ]
+    sentence_weights = np.array(sentence_weights).reshape(-1, 1)
+
+    # mean pool
     doc_vector = np.sum(generated_embeddings * sentence_weights, axis=0)                                    # weighted sum of sentence vector embeddings
     doc_vector /= np.sum(sentence_weights)                                                                  # document embedding normalization (mean pooling)
     embedding[doc_id] = doc_vector
