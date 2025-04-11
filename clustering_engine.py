@@ -25,9 +25,8 @@ def cluster_new(doc_id: int, doc_title: str, doc_text: str):
     # generate embeddings from the model and mean pool
     generated_embeddings = model(sentences)
     sentence_weights = np.array([doc_title_weight_factor] + [1] * (len(sentences) - 1)).reshape(-1, 1)
-    # doc_vector = np.mean(generated_embeddings, axis=0)
-    doc_vector = np.sum(generated_embeddings * sentence_weights, axis=0)                    # weighted sum of sentence vector embeddings
-    doc_vector /= np.sum(sentence_weights)                                                  # document embedding normalization (mean pooling)
+    doc_vector = np.sum(generated_embeddings * sentence_weights, axis=0)                                    # weighted sum of sentence vector embeddings
+    doc_vector /= np.sum(sentence_weights)                                                                  # document embedding normalization (mean pooling)
     embedding[doc_id] = doc_vector
 
     # microcluster based on embedding

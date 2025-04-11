@@ -1,4 +1,5 @@
 use_model/
+naive_bayes_model/
 data/
 .DS_Store
 __pycache__/
