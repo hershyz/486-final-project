@@ -5,7 +5,7 @@ import common
 
 # hyperparameters
 doc_title_weight_factor: float = 1.4                         # significance multiplier the title has over an arbitrary sentence from the rest of the text
-starting_best_mean_similarity: float = 0.5                   # discriminating cosine silimarity threshold for creating a new cluster
+cosine_simiarlty_threshold: float = 0.6                      # cosine similarity threshold for adding something to a new cluster
 
 # data
 embedding = {}                                               # embedding[doc_id] -> 512-dim mean pooled vector embedding
@@ -41,22 +41,42 @@ def cluster_new(doc_id: int, doc_title: str, doc_text: str):
     embedding[doc_id] = doc_vector
 
     # microcluster based on embedding
-    best_mean_similarity = starting_best_mean_similarity         # best cosine similarity to a cluster to beat
-    best_cluster = None                                          # index of the best cluster
+    # best_mean_similarity = starting_best_mean_similarity         # best cosine similarity to a cluster to beat
+    # best_cluster = None                                          # index of the best cluster
+
+    # for i, cluster in enumerate(clusters):
+        
+    #     cluster_embeddings = [embedding[doc_id] for doc_id in cluster]
+    #     cluster_centroid = np.mean(cluster_embeddings, axis=0)
+    #     similarity = cosine_similarity([doc_vector], [cluster_centroid])[0][0]
+
+    #     if abs(similarity) > abs(best_mean_similarity):
+    #         best_mean_similarity = similarity
+    #         best_cluster = i
+        
+    # if best_cluster is not None:
+    #     clusters[best_cluster].append(doc_id)
+    # else:
+    #     clusters.append([doc_id])
+    
+    # print(f'document {doc_id} assigned to cluster {best_cluster} with similarity {best_mean_similarity}.')
+
+    # multiclustering + microclustering based on cosine similarity
+    clusters_to_add = []
 
     for i, cluster in enumerate(clusters):
-        
+
         cluster_embeddings = [embedding[doc_id] for doc_id in cluster]
         cluster_centroid = np.mean(cluster_embeddings, axis=0)
         similarity = cosine_similarity([doc_vector], [cluster_centroid])[0][0]
 
-        if abs(similarity) > abs(best_mean_similarity):
-            best_mean_similarity = similarity
-            best_cluster = i
-        
-    if best_cluster is not None:
-        clusters[best_cluster].append(doc_id)
+        if similarity >= cosine_simiarlty_threshold:
+            clusters_to_add.append(i)
+    
+    if len(clusters_to_add) > 0:
+        for cluster_id in clusters_to_add:
+            clusters[cluster_id].append(doc_id)
+        print(f'document {doc_id} assigned to clusters {clusters_to_add}')
     else:
         clusters.append([doc_id])
-    
-    print(f'document {doc_id} assigned to cluster {best_cluster} with similarity {best_mean_similarity}.')
+        print(f'new cluster created for document {doc_id}')
