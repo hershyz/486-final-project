@@ -1,3 +1,4 @@
+from typing import Dict
 import tensorflow_hub as hub
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
@@ -10,6 +11,8 @@ cosine_simiarlty_threshold: float = 0.6                      # cosine similarity
 # data
 embedding = {}                                               # embedding[doc_id] -> 512-dim mean pooled vector embedding
 clusters = []                                                # clusters[i] = [doc id 1, doc id 2, ...]
+cluster_trustworthiness: Dict[int, float] = {}               # cluster id -> average probability of a real report [0, 1]
+n_clustered = 0                                              # number of documents clustered
 
 # load universal sentence encoder
 model = hub.load('use_model/archive')
@@ -17,7 +20,7 @@ model = hub.load('use_model/archive')
 # entry point for a new document, vectorizes the title and the text into a 512-dim vector using mean pooling
 def cluster_new(doc_id: int, doc_title: str, doc_text: str):
     
-    # # create batch embedding job
+    # create batch embedding job
     sentences = [doc_title]
     for sentence in doc_text.split('.'):
         if sentence.strip():
@@ -40,28 +43,7 @@ def cluster_new(doc_id: int, doc_title: str, doc_text: str):
     doc_vector /= np.sum(sentence_weights)                                                                  # document embedding normalization (mean pooling)
     embedding[doc_id] = doc_vector
 
-    # microcluster based on embedding
-    # best_mean_similarity = starting_best_mean_similarity         # best cosine similarity to a cluster to beat
-    # best_cluster = None                                          # index of the best cluster
-
-    # for i, cluster in enumerate(clusters):
-        
-    #     cluster_embeddings = [embedding[doc_id] for doc_id in cluster]
-    #     cluster_centroid = np.mean(cluster_embeddings, axis=0)
-    #     similarity = cosine_similarity([doc_vector], [cluster_centroid])[0][0]
-
-    #     if abs(similarity) > abs(best_mean_similarity):
-    #         best_mean_similarity = similarity
-    #         best_cluster = i
-        
-    # if best_cluster is not None:
-    #     clusters[best_cluster].append(doc_id)
-    # else:
-    #     clusters.append([doc_id])
-    
-    # print(f'document {doc_id} assigned to cluster {best_cluster} with similarity {best_mean_similarity}.')
-
-    # multiclustering + microclustering based on cosine similarity
+    # multiclustering + microclustering based on embedding cosine similarity
     clusters_to_add = []
 
     for i, cluster in enumerate(clusters):
@@ -73,10 +55,24 @@ def cluster_new(doc_id: int, doc_title: str, doc_text: str):
         if similarity >= cosine_simiarlty_threshold:
             clusters_to_add.append(i)
     
+    doc_trustworthiness = common.p_real(doc_title + ', ' + doc_text)
+
     if len(clusters_to_add) > 0:
+
         for cluster_id in clusters_to_add:
+            prev_trustworthiness = len(clusters[cluster_id]) * cluster_trustworthiness[cluster_id]
+            new_trustworthiness = prev_trustworthiness + doc_trustworthiness
             clusters[cluster_id].append(doc_id)
+            new_trustworthiness /= len(clusters[cluster_id])
+            cluster_trustworthiness[cluster_id] = new_trustworthiness
+
         print(f'document {doc_id} assigned to clusters {clusters_to_add}')
+
     else:
         clusters.append([doc_id])
+        cluster_trustworthiness[len(clusters) - 1] = doc_trustworthiness
         print(f'new cluster created for document {doc_id}')
+    
+    # increment number of documents clustered (useful metadata for heuristic)
+    global n_clustered
+    n_clustered += 1
