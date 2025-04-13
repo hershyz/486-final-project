@@ -29,8 +29,6 @@ Run
 ```bash
 python3 train_naive_bayes.py
 ```
-<<<<<<< Updated upstream
-=======
 before doing anything further.
 
 ## RabbitMQ on Docker
@@ -56,4 +54,3 @@ python3 Consumer.py
 ```
 
 - TODO : After pipeline, combine the backend docker and Consumer into a shell script so it can be run very simply with configurable arguments
->>>>>>> Stashed changes
