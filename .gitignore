@@ -3,3 +3,4 @@ naive_bayes_model/
 data/
 .DS_Store
 __pycache__/
+env/

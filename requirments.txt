@@ -1,0 +1,10 @@
+tensorflow
+tensorflow-hub
+pandas
+scikit-learn
+numpy
+matplotlib
+fastapi
+pika
+python-dotenv
+uvicorn
