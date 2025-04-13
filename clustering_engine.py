@@ -6,7 +6,7 @@ import common
 
 # hyperparameters
 doc_title_weight_factor: float = 1.4                         # significance multiplier the title has over an arbitrary sentence from the rest of the text
-cosine_simiarlty_threshold: float = 0.6                      # cosine similarity threshold for adding something to a new cluster
+cosine_simiarlty_threshold: float = 0.7                      # cosine similarity threshold for adding something to a new cluster
 
 # data
 embedding = {}                                               # embedding[doc_id] -> 512-dim mean pooled vector embedding

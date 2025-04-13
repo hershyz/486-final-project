@@ -2,9 +2,8 @@ import re
 import pickle
 from typing import List
 
-# simple regex-based tokenizer, keeps contraction and lowercase-normalizes words
+# simple regex-based tokenizer, keeps contractions
 def simple_tokenizer(text: str) -> List[str]:
-    text = text.lower()
     tokens = re.findall(r"\b\w+(?:'\w+)?\b", text)
     return tokens
 

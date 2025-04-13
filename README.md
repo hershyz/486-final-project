@@ -22,6 +22,7 @@ mkdir data  # Create a folder for the data
 ```
 - Download the file ```WELFake_Dataset.csv``` from [Kaggle](https://www.kaggle.com/datasets/saurabhshahane/fake-news-classification?resource=download).
 - Within the CSV, add the feature label ```doc_id``` first on the first line. It should read ```doc_id,title,text,label```.
+- Run ```python3 flip_labels.py``` to keep real/fake indexing consistent with the system.
 
 ### Building Naive Bayes Model
 Run

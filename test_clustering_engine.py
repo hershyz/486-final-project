@@ -113,9 +113,11 @@ for _ in range(25):
     print('~')
 
 print('cluster trustworthiness map:')
-print(clustering_engine.cluster_trustworthiness)
+print('cluster id | cluster trustworthiness')
+for cluster_id in clustering_engine.cluster_trustworthiness:
+    print(f'{cluster_id} | {clustering_engine.cluster_trustworthiness[cluster_id]}')
 
-for _ in range(5):
+for _ in range(25):
     print('~')
 
 print('inverse index for document id -> cluster ids:')
