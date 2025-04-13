@@ -2,11 +2,7 @@
 
 ### 1) Install Dependencies
 ```bash
-pip install tensorflow tensorflow-hub
-pip install pandas
-pip install scikit-learn
-pip install numpy
-pip install matplotlib
+pip install -r requirments.txt
 ```
 
 ### 2) Download Universal Sentence Encoder Model
@@ -31,7 +27,7 @@ python3 train_naive_bayes.py
 ```
 before doing anything further.
 
-## RabbitMQ on Docker
+### 5) RabbitMQ on Docker
 Run the following commands to create a rabbitMQ container
 
 ```bash
@@ -39,14 +35,14 @@ docker pull rabbitmq:3
 docker run -d --name rabbitmq -p 5672:5672 rabbitmq:3
 ```
 
-## Running the backend
+### 6) Running the backend
 Open terminal and run the following command from the root directory
 
 ```bash
 python3 backend.py
 ```
 
-## Running Consumer Endpoints
+### 7) Running Consumer Endpoints
 Open terminal and run the following command from the root directory
 
 ``` bash
