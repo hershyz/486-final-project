@@ -107,3 +107,16 @@ plt.ylabel('Time to Cluster (seconds)')
 plt.title('Clustering Time vs. Number of Documents Clustered')
 plt.grid(True, linestyle='--', alpha=0.7)
 plt.show()
+
+# display heuristic metadata
+for _ in range(25):
+    print('~')
+
+print('cluster trustworthiness map:')
+print(clustering_engine.cluster_trustworthiness)
+
+for _ in range(5):
+    print('~')
+
+print('inverse index for document id -> cluster ids:')
+print(clustering_engine.clusters_present)
