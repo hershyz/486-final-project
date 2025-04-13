@@ -13,7 +13,7 @@ embedding = {}                                               # embedding[doc_id]
 clusters: List[List[int]] = []                               # clusters[i] = [doc id 1, doc id 2, ...]
 cluster_trustworthiness: Dict[int, float] = {}               # cluster id -> average probability of a real report [0, 1]
 clusters_present: Dict[int, List[int]] = {}                  # doc id -> clusters present in
-n_clustered = 0                                              # number of documents clustered
+max_cluster_size: int = 0                                    # running max of the biggest cluster
 
 # load universal sentence encoder
 model = hub.load('use_model/archive')
@@ -67,6 +67,7 @@ def cluster_new(doc_id: int, doc_title: str, doc_text: str):
         clusters_present[doc_id] = []
 
     # add to >=1 clusters
+    global max_cluster_size
     if len(clusters_to_add) > 0:
 
         for cluster_id in clusters_to_add:
@@ -76,6 +77,7 @@ def cluster_new(doc_id: int, doc_title: str, doc_text: str):
             new_trustworthiness /= len(clusters[cluster_id])
             cluster_trustworthiness[cluster_id] = new_trustworthiness
             clusters_present[doc_id].append(cluster_id)
+            max_cluster_size = max(max_cluster_size, len(clusters[cluster_id]))
 
         print(f'document {doc_id} assigned to clusters {clusters_to_add}')
 
@@ -85,9 +87,6 @@ def cluster_new(doc_id: int, doc_title: str, doc_text: str):
         clusters.append([doc_id])
         cluster_trustworthiness[len(clusters) - 1] = doc_trustworthiness
         clusters_present[doc_id].append(len(clusters) - 1)
+        max_cluster_size = max(max_cluster_size, len(clusters[len(clusters) - 1]))
 
         print(f'new cluster created for document {doc_id}')
-    
-    # increment number of documents clustered (useful metadata for heuristic)
-    global n_clustered
-    n_clustered += 1
