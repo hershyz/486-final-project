@@ -12,7 +12,13 @@ class Document(BaseModel):
 class ConnectionObject:
     def __init__(self, hostName, queueName, port=None):
         self.queueName = queueName
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host= hostName))
+        # self.connection = pika.BlockingConnection(pika.ConnectionParameters(host= hostName))
+        self.connection = pika.BlockingConnection(
+            pika.ConnectionParameters(
+                host=hostName,
+                credentials=pika.PlainCredentials('guest', 'guest')
+            )
+        )
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue=queueName)
 
