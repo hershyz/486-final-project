@@ -55,10 +55,18 @@ def cluster_new(doc_id: int, doc_title: str, doc_text: str):
         if similarity >= cosine_simiarlty_threshold:
             clusters_to_add.append(i)
     
+    # find doc trustworthiness and convert to an indicator variable
     doc_trustworthiness = common.p_real(doc_title + ', ' + doc_text)
+    if doc_trustworthiness > 0.5:
+        doc_trustworthiness = 1
+    else:
+        doc_trustworthiness = 0
+
+    # avoid index errors on hashmap
     if doc_id not in clusters_present:
         clusters_present[doc_id] = []
 
+    # add to >=1 clusters
     if len(clusters_to_add) > 0:
 
         for cluster_id in clusters_to_add:
@@ -71,6 +79,7 @@ def cluster_new(doc_id: int, doc_title: str, doc_text: str):
 
         print(f'document {doc_id} assigned to clusters {clusters_to_add}')
 
+    # create a new cluster
     else:
 
         clusters.append([doc_id])
