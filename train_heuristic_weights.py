@@ -79,3 +79,10 @@ print(f'logreg accuracy: {accuracy * 100:.2f}%')
 print(f'Weight for normalized_cluster_size: {classifier.coef_[0][0]}')
 print(f'Weight for trustworthiness_score: {classifier.coef_[0][1]}')
 print(f'Intercept: {classifier.intercept_[0]}')
+
+'''
+    logreg accuracy: 96.00%
+    Weight for normalized_cluster_size: 1.8059274235333787
+    Weight for trustworthiness_score: 4.303592006176594
+    Intercept: -2.219142491933053
+'''

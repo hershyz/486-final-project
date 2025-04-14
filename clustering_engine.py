@@ -2,11 +2,17 @@ from typing import Dict, List
 import tensorflow_hub as hub
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
+import math
 import common
 
-# hyperparameters
+# hyperparameters for clustering engine
 doc_title_weight_factor: float = 1.4                         # significance multiplier the title has over an arbitrary sentence from the rest of the text
 cosine_simiarlty_threshold: float = 0.7                      # cosine similarity threshold for adding something to a new cluster
+
+# parameters for logistic regression classification of clsuters
+normalized_cluster_size_weight = 1.8059274235333787
+trustworthiness_score_weight = 4.303592006176594
+logreg_intercept = -2.219142491933053
 
 # data
 embedding = {}                                               # embedding[doc_id] -> 512-dim mean pooled vector embedding
@@ -90,3 +96,22 @@ def cluster_new(doc_id: int, doc_title: str, doc_text: str):
         max_cluster_size = max(max_cluster_size, len(clusters[len(clusters) - 1]))
 
         print(f'new cluster created for document {doc_id}')
+
+# inference function to predict cluster trustworthiness
+def predict_cluster_trustworthiness(cluster_id):
+    cluster = clusters[cluster_id]
+    
+    # compute input features
+    normalized_cluster_size = float(len(cluster)) / max_cluster_size
+    trustworthiness_score = cluster_trustworthiness[cluster_id]
+    
+    # logistic regression logit computation
+    logit = (
+        normalized_cluster_size_weight * normalized_cluster_size +
+        trustworthiness_score_weight * trustworthiness_score +
+        logreg_intercept
+    )
+    
+    # sigmoid function to convert to probability
+    prob_real = 1 / (1 + math.exp(-logit))
+    return prob_real

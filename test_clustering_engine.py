@@ -122,3 +122,22 @@ for _ in range(25):
 
 print('inverse index for document id -> cluster ids:')
 print(clustering_engine.clusters_present)
+
+# test inference on clusters
+for _ in range(25):
+    print('~')
+
+print('cluster id | predicted trustworthiness | real trustworthiness ratio | abs diff error')
+mean_diff_error = 0
+
+for cluster_id in range(len(clustering_engine.clusters)):
+    
+    predicted_cluster_trustworthiness = clustering_engine.predict_cluster_trustworthiness(cluster_id)
+    real_trustworthiness_ratio = real_ratios[cluster_id]
+    abs_diff_error = abs(real_trustworthiness_ratio - predicted_cluster_trustworthiness)
+    mean_diff_error += abs_diff_error
+
+    print(f'{cluster_id} | {predicted_cluster_trustworthiness} | {real_trustworthiness_ratio} | {abs_diff_error}')
+
+mean_diff_error = float(mean_diff_error) / len(clustering_engine.clusters)
+print(f'mean diff error (cluster classification): {mean_diff_error}')
