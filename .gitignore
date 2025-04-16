@@ -1,6 +1,13 @@
-use_model/
-naive_bayes_model/
-data/
-.DS_Store
+# Python virtual environment (default name)
+.venv/
+
+# Another Python virtual environment (you had this)
+myenv/
+
+# Node.js dependencies
+frontend/node_modules/
+
+# Add any other files/directories you want ignored
 __pycache__/
-env/
+*.pyc
+.DS_Store
