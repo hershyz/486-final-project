@@ -1,28 +1,57 @@
-from typing import Dict, List
+from typing import Dict, List, Set
 import tensorflow_hub as hub
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import math
 import common
 
+
 # hyperparameters for clustering engine
 doc_title_weight_factor: float = 1.4                         # significance multiplier the title has over an arbitrary sentence from the rest of the text
 cosine_simiarlty_threshold: float = 0.7                      # cosine similarity threshold for adding something to a new cluster
+untrusted_cluster_threshold: float = 0.2                     # trustworthiness score threshold for what's determined an untrusted cluster
+cluster_keyword_threshold: float = 0.3                       # deviation threshold from p_real = 0.5 for something to be considered a keyword
+
 
 # parameters for logistic regression classification of clsuters
 normalized_cluster_size_weight = 1.8059274235333787
 trustworthiness_score_weight = 4.303592006176594
 logreg_intercept = -2.219142491933053
 
+
 # data
 embedding = {}                                               # embedding[doc_id] -> 512-dim mean pooled vector embedding
+untrusted_clusters = set()                                   # set of untrusted clusters
+cluster_keywords: Dict[int, Set[str]] = {}                   # cluster id -> list of keywords
 clusters: List[List[int]] = []                               # clusters[i] = [doc id 1, doc id 2, ...]
 cluster_trustworthiness: Dict[int, float] = {}               # cluster id -> average probability of a real report [0, 1]
 clusters_present: Dict[int, List[int]] = {}                  # doc id -> clusters present in
 max_cluster_size: int = 0                                    # running max of the biggest cluster
 
+
 # load universal sentence encoder
 model = hub.load('use_model/archive')
+
+
+# inference function to predict cluster trustworthiness
+def predict_cluster_trustworthiness(cluster_id):
+    cluster = clusters[cluster_id]
+    
+    # compute input features
+    normalized_cluster_size = float(len(cluster)) / max_cluster_size
+    trustworthiness_score = cluster_trustworthiness[cluster_id]
+    
+    # logistic regression logit computation
+    logit = (
+        normalized_cluster_size_weight * normalized_cluster_size +
+        trustworthiness_score_weight * trustworthiness_score +
+        logreg_intercept
+    )
+    
+    # sigmoid function to convert to probability
+    prob_real = 1 / (1 + math.exp(-logit))
+    return prob_real
+
 
 # entry point for a new document, vectorizes the title and the text into a 512-dim vector using mean pooling
 def cluster_new(doc_id: int, doc_title: str, doc_text: str):
@@ -43,6 +72,14 @@ def cluster_new(doc_id: int, doc_title: str, doc_text: str):
         abs(common.p_real(sentence) - 0.5) for sentence in sentences[1:]
     ]
     sentence_weights = np.array(sentence_weights).reshape(-1, 1)
+
+    # update cluster keywords
+    doc_keywords: Set[str] = set()
+    for sentence in sentences:
+        for token in common.simple_tokenizer(sentence):
+            token_p_real = common.p_real(token)
+            if abs(token_p_real - 0.5) >= cluster_keyword_threshold:
+                doc_keywords.add(token)
 
     # mean pool
     doc_vector = np.sum(generated_embeddings * sentence_weights, axis=0)                                    # weighted sum of sentence vector embeddings
@@ -96,22 +133,34 @@ def cluster_new(doc_id: int, doc_title: str, doc_text: str):
         max_cluster_size = max(max_cluster_size, len(clusters[len(clusters) - 1]))
 
         print(f'new cluster created for document {doc_id}')
+    
+    # dynamically update inference on untrusted clusters
+    if len(clusters_to_add) == 0:
+        clusters_to_add.append(len(clusters) - 1)
+    for cluster_id in clusters_to_add:
+        curr_trustworthiness_score = predict_cluster_trustworthiness(cluster_id)
+        if curr_trustworthiness_score <= untrusted_cluster_threshold:
+            untrusted_clusters.add(cluster_id)
+        elif curr_trustworthiness_score > untrusted_cluster_threshold and cluster_id in untrusted_clusters:
+            untrusted_clusters.remove(cluster_id)
+    
+    # dynamically update cluster keywords
+    for cluster_id in clusters_to_add:
+        if cluster_id not in cluster_keywords:
+                cluster_keywords[cluster_id] = set()
+        for keyword in doc_keywords:
+            cluster_keywords[cluster_id].add(keyword)
 
-# inference function to predict cluster trustworthiness
-def predict_cluster_trustworthiness(cluster_id):
-    cluster = clusters[cluster_id]
-    
-    # compute input features
-    normalized_cluster_size = float(len(cluster)) / max_cluster_size
-    trustworthiness_score = cluster_trustworthiness[cluster_id]
-    
-    # logistic regression logit computation
-    logit = (
-        normalized_cluster_size_weight * normalized_cluster_size +
-        trustworthiness_score_weight * trustworthiness_score +
-        logreg_intercept
-    )
-    
-    # sigmoid function to convert to probability
-    prob_real = 1 / (1 + math.exp(-logit))
-    return prob_real
+
+# getter for untrusted clusters
+def get_untrusted_clusters() -> List[int]:
+    res = list(untrusted_clusters)
+    res.sort()
+    return res
+
+
+# getter for cluster keywords
+def get_cluster_keywords(cluster_id: int) -> List[int]:
+    res = list(cluster_keywords[cluster_id])
+    res.sort()
+    return res

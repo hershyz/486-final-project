@@ -2,10 +2,12 @@ import re
 import pickle
 from typing import List
 
+
 # simple regex-based tokenizer, keeps contractions
 def simple_tokenizer(text: str) -> List[str]:
     tokens = re.findall(r"\b\w+(?:'\w+)?\b", text)
     return tokens
+
 
 # simple naive bayes inference function, returns the probability [0, 1] that text belongs to a real report
 naive_bayes_model = None                             # map of word -> [probability fake, probability real]
