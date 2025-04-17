@@ -51,10 +51,10 @@ python3 Consumer.py
 ### 8) Running Consumer Endpoints
 
 
-![System Overview](OverviewScreenshot.jpg)
+![System Overview](OverviewScreenshot-NEW.jpg)
 
 
-![Cluster Overview](ClusterOverview.jpg)
+![Cluster Overview](ClusterOverview-NEW.jpg)
 
 - Ensure you have RabbitMQ running via Docker or on system.
 - Run the following commands in seperate terminal instances:
