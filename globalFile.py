@@ -36,17 +36,18 @@ class ConnectionObject:
             self.connection.close()
 
     def reconnect(self):
-            self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(
-                host=self.hostName,
-                credentials=pika.PlainCredentials('guest', 'guest'),
-                heartbeat=600 # 10 minute heartbeat
-                )
+        self.connection = pika.BlockingConnection(
+        pika.ConnectionParameters(
+            host=self.hostName,
+            credentials=pika.PlainCredentials('guest', 'guest'),
+            heartbeat=600 # 10 minute heartbeat
             )
-        
-            self.channel = self.connection.channel()
-            self.channel.queue_declare(queue=self.queueName)
+        )
+    
+        self.channel = self.connection.channel()
+        self.channel.queue_declare(queue=self.queueName)
 
+        print("Sucesfully Reconnected")
 
 
 class Producer(ConnectionObject):
@@ -72,25 +73,33 @@ class Consumer(ConnectionObject):
     def __init__(self, hostName, queueName):
         super().__init__(hostName, queueName)
         self.consumerTag = None
+        self.callback = None
 
     def __del__(self):
         self.closeConsumer()
 
 
     def registerCallback(self,callbackFunction):
+
+        self.callback = callbackFunction
         if self.consumerTag:
+            print(self.consumerTag)
             self.channel.basic_cancel(self.consumerTag)
         
+        print("registers Callback")
         self.consumerTag = self.channel.basic_consume(queue=self.queueName, on_message_callback=callbackFunction, auto_ack=True)
 
 
     def startConsumer(self):
         while True:
             try:
+                print("starts consumer")
                 self.channel.start_consuming()
             except Exception as e:
                 print("Regaining Connection")
                 self.reconnect()
+                print("re-registering callback")
+                self.registerCallback(self.callback)
 
     def closeConsumer(self):
         if self.consumerTag:
