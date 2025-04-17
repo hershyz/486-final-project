@@ -56,8 +56,8 @@ python3 Consumer.py
 
 ![Cluster Overview](ClusterOverview.jpg)
 
-- Ensure you have rabbitmq running from docker or on system
-- Run the following commands in seperate terminal instances
+- Ensure you have RabbitMQ running via Docker or on system.
+- Run the following commands in seperate terminal instances:
 
 ``` bash
 python3 backend.py # runs the backend or api endpoint
