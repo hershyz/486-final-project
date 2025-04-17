@@ -48,7 +48,7 @@ Open terminal and run the following command from the root directory
 ``` bash
 python3 Consumer.py
 ```
-### 8) Running Consumer Endpoints
+### 8) Hosting Dashboard
 
 
 ![System Overview](OverviewScreenshot-NEW.jpg)
