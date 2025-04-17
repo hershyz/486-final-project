@@ -20,14 +20,8 @@ const Layout = () => {
                 <NavLink to="/" className={navLinkClass} end>
                   Overview
                 </NavLink>
-                <NavLink to="/real-time" className={navLinkClass}>
-                  Real-time
-                </NavLink>
                 <NavLink to="/clusters" className={navLinkClass}>
                   Clusters
-                </NavLink>
-                <NavLink to="/documents" className={navLinkClass}>
-                  Documents
                 </NavLink>
                 <NavLink to="/system" className={navLinkClass}>
                   System

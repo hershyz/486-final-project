@@ -5,6 +5,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 import math
 import common
 
+from collections import defaultdict
+
 
 # hyperparameters for clustering engine
 doc_title_weight_factor: float = 1.4                         # significance multiplier the title has over an arbitrary sentence from the rest of the text
@@ -27,7 +29,6 @@ clusters: List[List[int]] = []                               # clusters[i] = [do
 cluster_trustworthiness: Dict[int, float] = {}               # cluster id -> average probability of a real report [0, 1]
 clusters_present: Dict[int, List[int]] = {}                  # doc id -> clusters present in
 max_cluster_size: int = 0                                    # running max of the biggest cluster
-
 
 # load universal sentence encoder
 model = hub.load('use_model/archive')
@@ -55,7 +56,7 @@ def predict_cluster_trustworthiness(cluster_id):
 
 # entry point for a new document, vectorizes the title and the text into a 512-dim vector using mean pooling
 def cluster_new(doc_id: int, doc_title: str, doc_text: str):
-    
+
     # create batch embedding job
     sentences = [doc_title]
     for sentence in doc_text.split('.'):
@@ -151,6 +152,15 @@ def cluster_new(doc_id: int, doc_title: str, doc_text: str):
         for keyword in doc_keywords:
             cluster_keywords[cluster_id].add(keyword)
 
+    # all the relevant information needed to return to frontend
+
+    ChangeInCluster = defaultdict(list)
+    for docCluster in clusters_to_add:
+        # the length of the cluster, the trustworthiness of the cluster, the keywords for the cluster, wehther cluster is untrusted
+        ChangeInCluster[docCluster] = [cluster_trustworthiness[docCluster], cluster_keywords[docCluster], True if docCluster in untrusted_clusters else False]
+
+    # Number of documents processed
+    return ChangeInCluster
 
 # getter for untrusted clusters
 def get_untrusted_clusters() -> List[int]:

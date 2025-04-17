@@ -10,6 +10,15 @@ const DocumentsPage = () => {
     console.log('Search button clicked (no action)');
   };
 
+
+  function tokenize(text) {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '')
+      .split(/\s+/)   
+      .filter(Boolean);     
+  }
+
   return (
     <div>
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">Document Explorer</h1>

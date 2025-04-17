@@ -48,5 +48,33 @@ Open terminal and run the following command from the root directory
 ``` bash
 python3 Consumer.py
 ```
+## Frontend Visualizations
 
-- TODO : After pipeline, combine the backend docker and Consumer into a shell script so it can be run very simply with configurable arguments
+
+![System Overview](OverviewScreenshot.jpg)
+
+
+![Cluster Overview](ClusterOverview.jpg)
+
+## Overall Steps to run
+- Ensure you have rabbitmq running from docker or on system
+- run the following commands in seperate terminals
+
+``` bash
+python3 backend.py # runs the backend or api endpoint
+python3 Consumer.py # runs the consumer service which ingests data from the queue
+
+# wait for Consumer to start before running the following command - will see a Consumer Starting print in terminal
+
+npm run dev # runs the frontend
+
+```
+
+now send POST requests to the folowing api with a document or documents in the following form
+
+{ 
+    document_id: str
+    title: str
+    content: str
+
+}
