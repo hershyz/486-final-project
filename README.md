@@ -48,7 +48,7 @@ Open terminal and run the following command from the root directory
 ``` bash
 python3 Consumer.py
 ```
-## Frontend Visualizations
+### 8) Running Consumer Endpoints
 
 
 ![System Overview](OverviewScreenshot.jpg)
