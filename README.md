@@ -69,11 +69,13 @@ npm run dev # runs the frontend
 
 ```
 
+```bash
 now send POST requests to the folowing api with a document or documents in the following form
 
 { 
-    document_id: str
-    title: str
-    content: str
+    document_id: 'str'
+    title: 'str'
+    content: 'str'
 
 }
+```
